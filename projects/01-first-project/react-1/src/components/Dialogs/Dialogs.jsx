@@ -1,8 +1,27 @@
 import React from "react";
-// import { addMessageActionCreator, updateNewMessageActionCreator } from "../../redux/dialogs-reducer";
+import { Field, reduxForm } from "redux-form";
+import { Textarea } from "../common/FormControls/FormControls";
 import DialogItem from "./DialogItem/DialogItem";
 import s from './Dialogs.module.css'
 import Message from "./Message/Message";
+import { maxLength, required } from "../../utils/validators/validators";
+
+const maxLength100 = maxLength(100)
+
+const NewMessageForm = (props) => {
+    return(
+    <form onSubmit={props.handleSubmit}>
+        <Field component={Textarea}
+            name='newMessage'
+            validate={[required, maxLength100]}
+        />
+        <button>Добавить</button>
+    </form>
+    )}
+
+const NewMessageReduxForm = reduxForm({
+    form: 'messagePost'
+})(NewMessageForm)
 
 const Dialogs = (props) => {
     let dialogsElements = props.dialogsPage.dialogsData.map(dialog => (
@@ -15,13 +34,8 @@ const Dialogs = (props) => {
         />
     ))
 
-    let onaddMessage = () => {
-        props.addMessage()
-    }
-
-    let onupdateNewMessage = (e) => {
-        let txt = e.target.value;
-        props.updateNewMessage(txt)
+    let onAddMessage = (values) => {
+        props.addMessage(values.newMessage)
     }
 
     return (
@@ -31,12 +45,8 @@ const Dialogs = (props) => {
             </div>
             <div className={s.messages}>
                 {messagesElements}
-                <textarea
-                    onChange={onupdateNewMessage}
-                    value={props.dialogsPage.newMessage}
-                ></textarea>
-                <button onClick={onaddMessage}>Добавить</button>
             </div>
+            <NewMessageReduxForm onSubmit={onAddMessage}/>
         </div>
     )
 }

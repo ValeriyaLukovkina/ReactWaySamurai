@@ -1,35 +1,10 @@
 import { connect } from "react-redux";
 import React from "react";
-import { addMessageActionCreator, updateNewMessageActionCreator } from "../../redux/dialogs-reducer";
+import { addMessageActionCreator } from "../../redux/dialogs-reducer";
 import Dialogs from "./Dialogs";
+import { WithAuthRedirerct } from "../../hoc/withAuthRedirect";
+import { compose } from "redux";
 
-// const DialogsContainer = (props) => {
-
-//     return (
-//         <StoreContext.Consumer>
-//             {
-//                 (store) => {
-//                     let addMessage = () => {
-//                         store.dispatch(addMessageActionCreator());
-//                     }
-
-//                     let updateNewMessage = (txt) => {
-//                         store.dispatch(updateNewMessageActionCreator(txt));
-//                     }
-
-//                     return (
-//                         <Dialogs
-//                             dialogsData={store.getState().dialogsPage.dialogsData}
-//                             messagesData={store.getState().dialogsPage.messagesData}
-//                             newMessage={store.getState().dialogsPage.newMessage}
-//                             addMessage={addMessage}
-//                             updateNewMessage={updateNewMessage} />
-//                     )
-//                 }
-//             }
-//         </StoreContext.Consumer>
-//     )
-// }
 
 let mapStateToProps= (state) => {
     return {
@@ -39,17 +14,22 @@ let mapStateToProps= (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        addMessage: () => {
-            dispatch(addMessageActionCreator());
-        },
-
-        updateNewMessage: (txt) => {
-            dispatch(updateNewMessageActionCreator(txt));
+        addMessage: (messageTxt) => {
+            dispatch(addMessageActionCreator(messageTxt));
         }
 
     }
 }
 
-const DialogsContainer = connect(mapStateToProps, mapDispatchToProps)(Dialogs);
 
-export default DialogsContainer;
+const mapStateToPropsForRedirect = (state) => {
+    return {
+        isAuth: state.auth.isAuth
+    }
+}
+
+export default compose(
+    connect(mapStateToProps, mapDispatchToProps),
+    connect(mapStateToPropsForRedirect),
+    WithAuthRedirerct
+)(Dialogs)
