@@ -2,27 +2,16 @@ import React from 'react';
 import s from './Users.module.css';
 import userPhoto from './../../assets/images/user.png';
 import { NavLink } from 'react-router-dom';
+import Paginator from '../common/Paginator/Paginator';
 
-const Users = (props) => {
-
-    let pagesCount = Math.ceil(props.totalUsersCount / props.pageSize);
-    let pages = [];
-    for (let i = 1; i <= pagesCount; i++) {
-        pages.push(i)
-    }
+const Users = ({currentPage, onPageChanged, totalUsersCount, pageSize, usersPage, followingIsProgress, unfollow, follow}) => {
 
     return (
         <div>
-            {pages.map((p) => {
-                return (
-                    <span
-                        onClick={() => props.onPageChanged(p)}
-                        className={props.currentPage === p && s.selected}>{p}</span>
-                )
-            })}
+            < Paginator currentPage={currentPage} onPageChanged={onPageChanged} totalUsersCount={totalUsersCount} pageSize={pageSize}/>
 
             {
-                props.usersPage.map((user) => {
+                usersPage.map((user) => {
                     return <div key={user.id}>
                         <span>
                             <div>
@@ -33,10 +22,10 @@ const Users = (props) => {
                                 </NavLink>
                             </div>
                             {user.followed
-                                ? <button disabled={props.followingIsProgress.some(id => id === user.id)}
-                                    onClick={() => props.unfollow(user.id)}>unfollow</button>
-                                : <button disabled={props.followingIsProgress.some(id => id === user.id)}
-                                    onClick={() => props.follow(user.id)}>follow</button>}
+                                ? <button disabled={followingIsProgress.some(id => id === user.id)}
+                                    onClick={() => unfollow(user.id)}>unfollow</button>
+                                : <button disabled={followingIsProgress.some(id => id === user.id)}
+                                    onClick={() => follow(user.id)}>follow</button>}
                         </span>
                         <span>
                             <span>

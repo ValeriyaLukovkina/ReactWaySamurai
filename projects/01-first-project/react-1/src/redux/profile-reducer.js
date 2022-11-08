@@ -2,7 +2,8 @@ import { profileAPI } from "../api/api";
 
 const ADD_POST = 'ADD-POST';
 const SET_USERS_PROFILE = 'SET-USERS-PROFILE';
-const SET_STATUS = 'SET-STATUS'
+const SET_STATUS = 'SET-STATUS';
+const DELETE_POST = 'DELETE_POST';
 
 let initialState = {
     postData: [
@@ -38,6 +39,11 @@ const profileReducer = (state = initialState, action) => {
                 ...state,
                 status: action.status
             }
+        case DELETE_POST:
+            return {
+                ...state,
+                postData: state.postData.filter(p => p.id !== action.postId)
+            }
         default:
             return state;
 
@@ -58,43 +64,26 @@ export let setUserProfile = (profile) => {
     }
 }
 
-export let setStatus = (status) => {
-    return {
-        type: SET_STATUS,
-        status
-    }
+export let setStatus = (status) => ({ type: SET_STATUS, status });
+
+export const deletePost = (postId) => ({ type: DELETE_POST, postId });
+
+
+export const getProfile = (userId) => async (dispatch) => {
+    let promise = await profileAPI.getProfile(userId);
+    dispatch(setUserProfile(promise));
 }
 
-export const getProfile = (userId) => {
-    return (dispatch) => {
-        profileAPI.getProfile(userId)
-            .then(data => {
-                dispatch(setUserProfile(data))
-            })
-    }
+export const getStatus = (userId) => async (dispatch) => {
+    let promise = await profileAPI.getStatus(userId);
+    dispatch(setStatus(promise));
 }
 
-export const getStatus = (userId) => {
-    return (dispatch) => {
-        profileAPI.getStatus(userId)
-            .then(data => {
-                dispatch(setStatus(data))
-            })
+export const updateStatus = (status) => async (dispatch) => {
+    let promise = await profileAPI.updateStatus(status);
+    if (promise.resultCode === 0) {
+        dispatch(setStatus(status))
     }
 }
-
-export const updateStatus = (status) => {
-    return (dispatch) => {
-        profileAPI.updateStatus(status)
-        .then(data => {
-            if (data.resultCode === 0) {
-                dispatch(setStatus(status))
-            }
-
-        })
-    }
-}
-
-
 
 export default profileReducer;
